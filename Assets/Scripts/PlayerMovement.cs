@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public GameObject BulletPrefab;
     public float SpeedForce;
     public float JumpForce;
+    public float RateofFire;
     
     private Rigidbody2D Rigidbody2D;
     private Animator Animator;
     private float Horizontal;
     private bool OnGround;
+    private float LastShoot;
    
     void Start()
     {
@@ -34,11 +37,17 @@ public class PlayerMovement : MonoBehaviour
         }
         else OnGround = false;
 
-        if (Input.GetKeyDown(KeyCode.Space) && OnGround)
+        if (Input.GetKeyDown(KeyCode.W) && OnGround)
         {
             Jump();
         }    
         
+        if (Input.GetKey(KeyCode.Space) && Time.time > LastShoot + RateofFire)
+        {
+            Shoot();
+            LastShoot = Time.time;
+        }
+
     }
 
     private void Jump()
@@ -46,9 +55,27 @@ public class PlayerMovement : MonoBehaviour
         Rigidbody2D.AddForce(Vector2.up * JumpForce);
     }
     
+    private void Shoot()
+    {
+        Vector3 direction;
+        if (transform.localScale.x == 4.0f) direction = Vector3.right;
+        else direction = Vector3.left;
+        
+        GameObject bullet = Instantiate(BulletPrefab, transform.position + direction * 0.1f, Quaternion.identity);
+        bullet.GetComponent<BulletScript>().SetDirection(direction);
+    }
 
     private void FixedUpdate()
     {
         Rigidbody2D.velocity = new Vector2(Horizontal * SpeedForce, Rigidbody2D.velocity.y); 
     }
+
+    //Method for player death and reset scene
+
+    public void Die()
+    {
+        Debug.Log("Jugador destruido");        
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
 }
