@@ -7,7 +7,8 @@ public class EnemyZMovement : MonoBehaviour
     public float PatrolSpeed = 2.0f;         
     public float ChaseSpeed = 4.0f;         
     public float DetectionRange = 5.0f;     
-    public float ChangeDirectionTime = 3.0f; 
+    public float ChangeDirectionTime = 3.0f;
+    
 
     private Rigidbody2D Rigidbody2D;
     private Vector2 PatrolDirection = Vector2.right;
@@ -21,6 +22,7 @@ public class EnemyZMovement : MonoBehaviour
         ChangeDirectionTimer = ChangeDirectionTime;
 
         
+
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -41,18 +43,17 @@ public class EnemyZMovement : MonoBehaviour
     void FixedUpdate()
     {
         if (IsChasing)
-        {
-            Vector2 directionToPlayer = (PlayerTransform.position - transform.position).normalized;
-            Rigidbody2D.velocity = new Vector2(directionToPlayer.x * ChaseSpeed, Rigidbody2D.velocity.y);
-        }
+            {
+                Vector2 directionToPlayer = (PlayerTransform.position - transform.position).normalized;
+                Rigidbody2D.velocity = new Vector2(directionToPlayer.x * ChaseSpeed, Rigidbody2D.velocity.y);
+            }
         else
-        {
-            Patrol();
-        }
-
-        
+            {
+               Patrol();
+            }
+       
     }
-
+    
     private void Patrol()
     {
         ChangeDirectionTimer -= Time.deltaTime;
@@ -72,15 +73,19 @@ public class EnemyZMovement : MonoBehaviour
 
     // From here on, the function of receiving hits from the enemy is written.
 
-    public int MaxHits = 5; 
-    private int CurrentHits = 0;
+    public int MaxHits = 5; // hits needed for die      
+
+    private int CurrentHits = 0; // count of hits received
+    
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Bullet")) 
         {
             CurrentHits++;
-            Destroy(collision.gameObject); 
+            Destroy(collision.gameObject);
+
+            
 
             if (CurrentHits >= MaxHits)
             {
